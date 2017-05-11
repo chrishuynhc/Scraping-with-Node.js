@@ -5,5 +5,4 @@ scraper.imgScrape(url, function(data){
 
 	console.log('Data from scraper received');
 	console.log(data);
-
 })
