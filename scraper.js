@@ -42,12 +42,17 @@ exports.amazonScrape = function(url, cb){
 
 		let $ = cheerio.load(body);
 		$url = url;
-		$price = $('.olpOfferPrice').first().text();
+		$title = $('h1').first().text().trim();
+		$condition = $('.olpCondition').first().text().trim();
+		$price = $('.olpOfferPrice').first().text().trim();
 
 		let price = {
-			price: $price
+			title: $title,
+			condition: $condition,
+			price: $price,
 		}
 		cb(price)
-
 	})
 }
+
+
