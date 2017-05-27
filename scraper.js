@@ -1,7 +1,5 @@
 const request = require('request');
 const cheerio = require('cheerio');
-const jQuery = require('jquery');
-
 
 //Callback Function
 exports.imgScrape = function(url, cb){
@@ -41,18 +39,62 @@ exports.amazonScrape = function(url, cb){
 		}
 
 		let $ = cheerio.load(body);
+
+
 		$url = url;
 		$title = $('h1').first().text().trim();
 		$condition = $('.olpCondition').first().text().trim();
 		$price = $('.olpOfferPrice').first().text().trim();
 
 		let price = {
+			
 			title: $title,
 			condition: $condition,
 			price: $price,
 		}
-		cb(price)
-	})
-}
+
+		cb(price);
+	});
+};
+
+exports.redditScrape = function(url, cb){
+
+	request(url, function(err, resp, body){
+		if (err){
+			cb({
+				error: error
+			})
+		}
+
+		let $ = cheerio.load(body);
+
+
+		$url = url;
+		$title = $('a.title').first().text();
+		$subreddit = $('a.subreddit').first().text();
+
+		let price = {
+			
+			title: $title,
+			subreddit: $subreddit
+		}
+		cb(price);
+	});
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
