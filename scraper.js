@@ -1,5 +1,6 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const jQuery = require('jquery');
 
 
 //Callback Function
@@ -29,3 +30,24 @@ exports.imgScrape = function(url, cb){
 		cb(image);
 	});
 };
+
+exports.amazonScrape = function(url, cb){
+
+	request(url, function(err, resp, body){
+		if (err){
+			cb({
+				error: error
+			})
+		}
+
+		let $ = cheerio.load(body);
+		$url = url;
+		$price = $('.olpOfferPrice').first().text();
+
+		let price = {
+			price: $price
+		}
+		cb(price)
+
+	})
+}
