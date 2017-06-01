@@ -131,6 +131,15 @@ app.get('/api/:_isbn', function(req, res){
 	//Headers
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	const options = {  
+	    url: amazonUsed,
+	    method: 'GET',
+	    headers: {
+	        'Accept': 'application/json',
+	        'Accept-Charset': 'utf-8',
+	        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.6) Gecko/20070725'
+	    }
+	};
 	
 	//Links
 	var amazonUsed = 'https://www.amazon.com/gp/offer-listing/' + req.params._isbn + '/ref=olp_f_used?ie=UTF8&f_used=true&f_usedAcceptable=true&f_usedGood=true&f_usedLikeNew=true&f_usedVeryGood=true';
@@ -157,7 +166,7 @@ app.get('/api/:_isbn', function(req, res){
 	};
 
 	//First request for Used
-	request(amazonUsed, function(err, resp, body){
+	request(options, function(err, resp, body){
 
 		if (err){
 			res.send('Error!');
