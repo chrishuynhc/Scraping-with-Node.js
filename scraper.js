@@ -1,5 +1,8 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const express = require('express');
+
+var app = express();
 
 //Callback Function
 exports.imgScrape = function(url, cb){
@@ -122,7 +125,85 @@ function getBooks(searchText){
         });
 };
 
+app.get('/api/:_isbn', function(req, res){
 
+
+	//Headers
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	
+	//Links
+	var amazonUsed = 'https://www.amazon.com/gp/offer-listing/' + req.params._isbn + '/ref=olp_f_used?ie=UTF8&f_used=true&f_usedAcceptable=true&f_usedGood=true&f_usedLikeNew=true&f_usedVeryGood=true';
+	var amazonNew = 'https://www.amazon.com/gp/offer-listing/' + req.params._isbn + '/ref=olp_f_new?ie=UTF8&f_new=true';
+	var amazonRental = '';
+
+	//Return object with info
+	var p = {
+		title: '',
+		options: 
+		[
+			{
+				condition: '',
+				price: '',
+				url: '',
+			},
+			{
+				condition: '',
+				price: '',
+				url: '',
+			},
+			
+		]
+	};
+
+	//First request for Used
+	request(amazonUsed, function(err, resp, body){
+
+		if (err){
+			res.send('Error!');
+		}
+
+		let $ = cheerio.load(body);
+
+		$title = $('h1').first().text().trim().replace(/  /g, '');
+		$condition = $('.olpCondition').first().text().trim().replace(/  /g, '').replace('\n', ' ');
+		$price = $('.olpOfferPrice').first().text().trim();
+
+		p.title = $title;
+		p.options[0].condition = $condition;
+		p.options[0].price = $price;
+		p.options[0].url = amazonUsed;
+
+		//Second request for New
+		request(amazonNew, function(err, resp, body){
+
+			if (err){
+				res.send('Error!');
+			}
+
+			let $ = cheerio.load(body);
+
+			//$title = $('h1').first().text().trim().replace(/  /g, '');
+			$condition = $('.olpCondition').first().text().trim().replace(/  /g, '').replace('\n', ' ');
+			$price = $('.olpOfferPrice').first().text().trim();
+
+			p.options[1].condition = $condition;
+			p.options[1].price = $price;
+			p.options[1].url = amazonNew;
+
+			//Second request for New
+			
+
+			res.send(p);
+		});
+	});
+	
+});
+
+
+app.listen(3000, function(){
+	console.log('Server Started on Port 3000...');
+});
 
 
 
