@@ -210,6 +210,39 @@ app.get('/api/:_isbn', function(req, res){
 	
 });
 
+function getPrice(url, p, cb){
+
+	const options = {  
+	    url: url,
+	    method: 'GET',
+	    headers: {
+	        'Accept': 'application/json',
+	        'Accept-Charset': 'utf-8',
+	        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.1.6) Gecko/20070725'
+	    }
+	};
+
+	request(options, function(err, resp, body){
+
+		let $ = cheerio.load(body);
+
+		$title = $('h1').first().text().trim().replace(/  /g, '');
+		$condition = $('.olpCondition').first().text().trim().replace(/  /g, '').replace('\n', ' ');
+		$price = $('.olpOfferPrice').first().text().trim();
+		$shipping = $('.olpShippingPrice').first().text();
+
+		p.title = $title;
+		p.options.push({
+			condition: $condition,
+			price: $price,
+			shipping: $shipping,
+			url: options.url
+		});
+		cb();
+	});
+}
+
+
 
 app.listen(3000, function(){
 	console.log('Server Started on Port 3000...');
